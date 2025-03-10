@@ -45,6 +45,24 @@ app.get("/chat-conversation", async (req, res) => {
   res.send({ rumorMessage: answer });
 });
 
+app.get("/generate-json", async (req, res) => {
+  const prompt = req.query?.prompt;
+
+  if (!prompt) {
+    res.send({ message: "Please provide a prompt in query" });
+    return;
+  }
+
+  const finalPrompt = `Generate some data from this prompt ${prompt} using this JSON schema:
+    data = {'datatype': output}
+    Return: Array<Recipe>`;
+
+  const result = await model.generateContent(finalPrompt);
+  const output = result.response.text().slice(7, -4);
+  const finalOutput = JSON.parse(output);
+  res.send(finalOutput);
+});
+
 app.get("/", (req, res) => {
   res.send({ messag: "Let's crack the ai ......" });
 });
